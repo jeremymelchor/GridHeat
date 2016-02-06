@@ -55,46 +55,70 @@ int main(int argc, char *argv[]) {
 
 	float **grid;
 	int nb_iterations=10000;
-	int program_step= NULL;
-	int num_threads= NULL;
+	int *program_step= NULL;
+	int *num_threads= NULL;
+	int *nb_case_per_line = NULL;			
+	bool MFLAG=false;
+	bool AFLAG=false;
 
 	for (int i =0; i<argc; i++) {
 		// Récupération de la taille du problème
 		if (strcmp(argv[i],"-s") == 0) {
 			char *s_param = argv[i+1];
 			//récuperer les différentes tailles dans un tableau de int
-			int *nb_case_per_line = NULL;			
 			int index = 0;
 
 			while (s_param[index] != '\0') {
+				//on construit le tableau à la bonne taille
 				nb_case_per_line = malloc(((int)strlen(s_param))*sizeof(int));
+				//et on range les int dedans
 				nb_case_per_line[index] = atoi(&s_param[index]);
 				index++;
 			}
-			
+
 			/*//A DEPLACER//////////////////
 			//on crée la dimension 1;
 			grid = malloc(nb_case_per_line*sizeof(float*));
 			//puis les lignes dimension 2
 			for(int i = 0 ; i < nb_case_per_line;i++){
-				grid[i] = malloc(nb_case_per_line*sizeof(float));
+			grid[i] = malloc(nb_case_per_line*sizeof(float));
 			}
 			//////////////////////////////*/
 		}
 		if (strcmp(argv[i],"-m") == 0) {
 			//mode execution
+			MFLAG=true;
 		}
 		if (strcmp(argv[i],"-a") == 0) {
+			AFLAG=true;
 
 		}
 		if (strcmp(argv[i],"-i") == 0) {
 			nb_iterations = atoi(argv[i]);
 		}
 		if (strcmp(argv[i],"-e") == 0) {
-			program_step = atoi(argv[i]);
+			int index = 0;
+			char *e_param = argv[i+1];
+
+			while (e_param[index] != '\0') {
+				//on construit le tableau à la bonne taille
+				program_step = malloc(((int)strlen(e_param))*sizeof(int));
+				//et on range les int dedans
+				program_step[index] = atoi(&e_param[index]);
+				index++;
+			}
 		}
 		if (strcmp(argv[i],"-t") == 0) {
-			num_threads = atoi(argv[i]);
+			int index = 0;
+			char *t_param = argv[i+1];
+
+			while (t_param[index] != '\0') {
+				//on construit le tableau à la bonne taille
+				num_threads = malloc(((int)strlen(t_param))*sizeof(int));
+				//et on range les int dedans
+				num_threads[index] = atoi(&t_param[index]);
+				index++;
+			}
 		}
 
 	}
