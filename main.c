@@ -51,27 +51,51 @@ int main(int argc, char *argv[]) {
 
 	int *test = NULL;
 	test = malloc(10*sizeof(int));
-	printf("%li\n",sizeof(test));
+	printf("size: %i\n",sizeof(test));
+
+	float **grid;
+	int nb_iterations=10000;
+	int program_step= NULL;
+	int num_threads= NULL;
 
 	for (int i =0; i<argc; i++) {
-		// Récupération des différentes tailles du problème
+		// Récupération de la taille du problème
 		if (strcmp(argv[i],"-s") == 0) {
-			char *liste_taille_probleme = argv[i+1];
-			int iterateur = 0;
+			char *s_param = argv[i+1];
+			//récuperer les différentes tailles dans un tableau de int
+			int *nb_case_per_line = NULL;			
+			int index = 0;
 
-			int *memoireAllouee = NULL;
-			memoireAllouee = malloc(sizeof(int));
-			if (memoireAllouee == NULL) exit(0);
-
-			while (liste_taille_probleme[iterateur] != '\0') {
-				memoireAllouee[iterateur] = liste_taille_probleme[iterateur] - '0';
-				printf("%d\n",memoireAllouee[iterateur]);
-			 	memoireAllouee = realloc(memoireAllouee, (iterateur+2)*sizeof(int));
-			 	iterateur++;
+			while (s_param[index] != '\0') {
+				nb_case_per_line = malloc(((int)strlen(s_param))*sizeof(int));
+				nb_case_per_line[index] = atoi(&s_param[index]);
+				index++;
 			}
-			printf("%d\n",sizeof(memoireAllouee));
-			//int j=0;
-			//while (memoireAllouee[j]!='\0') printf("%d\n",memoireAllouee[j]);
+			
+			/*//A DEPLACER//////////////////
+			//on crée la dimension 1;
+			grid = malloc(nb_case_per_line*sizeof(float*));
+			//puis les lignes dimension 2
+			for(int i = 0 ; i < nb_case_per_line;i++){
+				grid[i] = malloc(nb_case_per_line*sizeof(float));
+			}
+			//////////////////////////////*/
 		}
+		if (strcmp(argv[i],"-m") == 0) {
+			//mode execution
+		}
+		if (strcmp(argv[i],"-a") == 0) {
+
+		}
+		if (strcmp(argv[i],"-i") == 0) {
+			nb_iterations = atoi(argv[i]);
+		}
+		if (strcmp(argv[i],"-e") == 0) {
+			program_step = atoi(argv[i]);
+		}
+		if (strcmp(argv[i],"-t") == 0) {
+			num_threads = atoi(argv[i]);
+		}
+
 	}
 }
