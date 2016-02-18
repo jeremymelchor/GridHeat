@@ -148,7 +148,7 @@ int main(int argc, char *argv[]) {
 
 		}
 		if (strcmp(argv[i],"-i") == 0) {
-			nb_iterations = atoi(argv[i]);
+			nb_iterations = atoi(argv[i+1]);
 		}
 		if (strcmp(argv[i],"-e") == 0) {
 			int index = 0;
