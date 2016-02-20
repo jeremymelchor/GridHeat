@@ -12,6 +12,8 @@
 #define TEMP_FROID 0
 
 int taillePlaque;
+bool MFLAG=false;
+bool AFLAG=false;
 
 struct Param{
 	int *p_array;
@@ -89,7 +91,9 @@ void iterative_way(float (*plaque)[taillePlaque], int nbIterations) {
 	for (int i=0; i<nbIterations; i++) {
 		horizontal_step(plaque);
 		vertical_step(plaque);
-		print_plaque(plaque);
+		if(!MFLAG){
+			print_plaque(plaque);
+		}
 	}
 }
 
@@ -98,8 +102,11 @@ void simulation(int puissance_taillePlaque, int nbIterations, int nbThread) {
 	taillePlaque = convertPowToSize(puissance_taillePlaque);
 
 	if (taillePlaque*taillePlaque > TAILLE_MAX || taillePlaque*taillePlaque < TAILLE_MIN) {
-		printf("%d\n",taillePlaque*taillePlaque);
-		printf("Taille de la plaque trop grande\n");
+		if(!MFLAG){
+
+			printf("%d\n",taillePlaque*taillePlaque);
+			printf("Taille de la plaque trop grande\n");
+		}
 		exit(0);
 	}
 
@@ -172,8 +179,7 @@ int main(int argc, char *argv[]) {
 	nb_case_per_line.size=0;
 
 
-	bool MFLAG=false;
-	bool AFLAG=false;
+	
 
 	for (int i =1; i<argc; i++) {
 		// Récupération de la taille du problème
@@ -244,7 +250,9 @@ int main(int argc, char *argv[]) {
 
 	}
 
-	//display_options(nb_iterations,&program_step,&num_threads,&nb_case_per_line,MFLAG,AFLAG);
+	if(!MFLAG){
+		display_options(nb_iterations,&program_step,&num_threads,&nb_case_per_line,MFLAG,AFLAG);
+	}
 	simulation(0,nb_iterations,NB_MIN_THREAD);
 }
 
