@@ -47,52 +47,50 @@ int convertPowToSize(int puissance_taillePlaque) {
 }
 
 
-void horizontal_step(float (*plaque)[taillePlaque]) {
-	int index_avant, index_apres;
+float vertical(float (*plaque_apres)[taillePlaque], float current_value, int i, int j) {
+	if ( (i-1) < 0 ) 
+		plaque_apres[i+1][j] += current_value/6;
+	else if ( (i+1) >= taillePlaque) 
+		plaque_apres[i-1][j] += current_value/6; 
+	else {
+		plaque_apres[i-1][j] += current_value/6;
+		plaque_apres[i+1][j] += current_value/6;
+	}
+	return current_value -= current_value/3;
+}
+
+void calculate_grid(float (*plaque_avant)[taillePlaque], float (*plaque_apres)[taillePlaque]) {
 	for (int i=0; i<taillePlaque; i++) {
 		for (int j=0; j<taillePlaque; j++) {
-			if (plaque[i][j] != TEMP_FROID) {
-				index_avant = j-1; index_apres = j+1;
-				if (index_avant < 0) 
-					plaque[i][index_apres] += (plaque[i][j])/6;
-				else if (index_apres >= taillePlaque) 
-					plaque[i][index_avant] += (plaque[i][j])/6; 
+			if (plaque_avant[i][j] != TEMP_FROID) {
+				if ( (j-1) < 0 ) 
+					plaque_apres[i][j+1] += vertical(plaque_apres,(plaque_avant[i][j])/6, i, j+1);
+				else if ( (j+1) >= taillePlaque ) 
+					plaque_apres[i][j-1] += vertical(plaque_apres,(plaque_avant[i][j])/6, i, j-1); 
 				else {
-					plaque[i][index_avant] += (plaque[i][j])/6;
-					plaque[i][index_apres] += (plaque[i][j])/6;
+					plaque_apres[i][j-1] += vertical(plaque_apres,(plaque_avant[i][j])/6, i, j-1);
+					plaque_apres[i][j+1] += vertical(plaque_apres,(plaque_avant[i][j])/6, i, j+1);
 				}
-				plaque[i][j] = plaque[i][j] - (plaque[i][j]/3);
+				float value = plaque_avant[i][j] - plaque_avant[i][j]/3;
+				plaque_apres[i][j] += vertical(plaque_apres,value, i, j);
 			}
+			//print_plaque(plaque_apres);
 		}
 	}
 }
 
-void vertical_step(float (*plaque)[taillePlaque]) {
-	int index_avant, index_apres;
-	for (int i=0; i<taillePlaque; i++) {
-		for (int j=0; j<taillePlaque; j++) {
-			if (plaque[i][j] != TEMP_FROID) {
-				index_avant = i-1; index_apres = i+1;
-				if (index_avant < 0) 
-					plaque[index_apres][j] += (plaque[i][j])/6;
-				else if (index_apres >= taillePlaque) 
-					plaque[index_avant][j] += (plaque[i][j])/6; 
-				else {
-					plaque[index_avant][j] += (plaque[i][j])/6;
-					plaque[index_apres][j] += (plaque[i][j])/6;
-				}
-				plaque[i][j] = plaque[i][j] - (plaque[i][j]/3);
-			}
-		}
-	}
+void matrix_copy(float (*dest)[taillePlaque], float (*src)[taillePlaque]) {
+	memcpy(dest, src, taillePlaque*taillePlaque*sizeof(float));
 }
 
-void iterative_way(float (*plaque)[taillePlaque], int nbIterations) {
+void iterative_way(float (*plaque_avant)[taillePlaque], float (*plaque_apres)[taillePlaque], int nbIterations) {
 	for (int i=0; i<nbIterations; i++) {
-		horizontal_step(plaque);
-		vertical_step(plaque);
+		calculate_grid(plaque_avant, plaque_apres);
+		matrix_copy(plaque_avant, plaque_apres);
+		print_plaque(plaque_apres);
+		memset(plaque_apres,0,taillePlaque*taillePlaque*sizeof(float));
 		if(!MFLAG){
-			print_plaque(plaque);
+			print_plaque(plaque_apres);
 		}
 	}
 }
@@ -102,24 +100,24 @@ void simulation(int puissance_taillePlaque, int nbIterations, int nbThread) {
 	taillePlaque = convertPowToSize(puissance_taillePlaque);
 
 	if (taillePlaque*taillePlaque > TAILLE_MAX || taillePlaque*taillePlaque < TAILLE_MIN) {
-		if(!MFLAG){
-
+		if (!MFLAG) {
 			printf("%d\n",taillePlaque*taillePlaque);
 			printf("Taille de la plaque trop grande\n");
 		}
 		exit(0);
 	}
 
-	float plaque[taillePlaque][taillePlaque];
+	float plaque_avant[taillePlaque][taillePlaque];
+	float plaque_apres[taillePlaque][taillePlaque];
+	memset(plaque_apres,0,taillePlaque*taillePlaque*sizeof(float));
+
 	int i_min = pow(2,sqrt(taillePlaque)-1) - pow(2,sqrt(taillePlaque)-4);
 	int i_max = pow(2,sqrt(taillePlaque)-1) + pow(2,sqrt(taillePlaque)-4);
-	//printf("%d i_min : \n",i_min);
-	//printf("%d i_max : \n",i_max);
 
-	init_plaque(plaque, i_min, i_max);
+	init_plaque(plaque_avant, i_min, i_max);
 
 	if (nbThread == 1) {
-		iterative_way(plaque, nbIterations);
+		iterative_way(plaque_avant, plaque_apres, nbIterations);
 	}
 	else {
 		printf("Pas encore géré !");
@@ -168,7 +166,7 @@ void display_options(int nb_iterations,struct Param *program_step,struct Param *
 
 int main(int argc, char *argv[]) {
 
-	int nb_iterations = 10000;
+	int nb_iterations = 2;
 
 	struct Param program_step;
 	program_step.size=0;
