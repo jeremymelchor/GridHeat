@@ -103,7 +103,6 @@ void simulation(int puissance_taillePlaque, int nbIterations, int nbThread) {
 
 	if (taillePlaque*taillePlaque > TAILLE_MAX || taillePlaque*taillePlaque < TAILLE_MIN) {
 		if(!MFLAG){
-
 			printf("%d\n",taillePlaque*taillePlaque);
 			printf("Taille de la plaque trop grande\n");
 		}
