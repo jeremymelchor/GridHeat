@@ -6,8 +6,8 @@
 #include <time.h>
 
 /**
- @authors : Jeremy Melchor
-			Matthieu Perrin
+@authors : Jeremy Melchor
+Matthieu Perrin
 **/
 #define TAILLE_MIN 256
 #define TAILLE_MAX 67108864
@@ -19,6 +19,7 @@
 int taillePlaque;
 bool MFLAG=true;
 bool AFLAG=false;
+bool MMFLAG=false;
 
 struct Param{
 	int *p_array;
@@ -58,8 +59,8 @@ int convertPowToSize(int puissance_taillePlaque) {
 
 
 /* Fais les calculs verticalement sur la grille a partir
-	de l'emplacement i et j passe en parametre ainsi que la valeur 
-	de la case du milieu. Return la valeur de la case du milieu */
+de l'emplacement i et j passe en parametre ainsi que la valeur 
+de la case du milieu. Return la valeur de la case du milieu */
 float vertical(float (*plaque_apres)[taillePlaque], float current_value, int i, int j) {
 	if ( (i-1) < 0 ) 
 		plaque_apres[i+1][j] += current_value/6;
@@ -74,8 +75,8 @@ float vertical(float (*plaque_apres)[taillePlaque], float current_value, int i, 
 
 
 /* methode principale de calcul de la grille, pour chaque case ayant une valeur
-	non nulle de temperature, on calcule ses valeurs verticale avec la fonction
-	vertical, puis on inscrit la valeur de la case centrale */
+non nulle de temperature, on calcule ses valeurs verticale avec la fonction
+vertical, puis on inscrit la valeur de la case centrale */
 void calculate_grid(float (*plaque_avant)[taillePlaque], float (*plaque_apres)[taillePlaque]) {
 	for (int i=0; i<taillePlaque; i++) {
 		for (int j=0; j<taillePlaque; j++) {
@@ -99,7 +100,7 @@ void calculate_grid(float (*plaque_avant)[taillePlaque], float (*plaque_apres)[t
 
 
 /* Copie la matrice finale dans l'ancienne afin de pouvoir la reutiliser
-	en tant qu'ancienne plaque */
+en tant qu'ancienne plaque */
 void matrix_copy(float (*dest)[taillePlaque], float (*src)[taillePlaque]) {
 	memcpy(dest, src, taillePlaque*taillePlaque*sizeof(float));
 }
@@ -120,7 +121,7 @@ void iterative_way(float (*plaque_avant)[taillePlaque], float (*plaque_apres)[ta
 
 
 /* methode principale, c'est elle qui dit quelle methode sera lancee
-	en fonction des differents parametres recus */
+en fonction des differents parametres recus */
 void simulation(int puissance_taillePlaque, int nbIterations, int nbThread) {
 	taillePlaque = convertPowToSize(puissance_taillePlaque);
 
@@ -191,6 +192,38 @@ void display_options(int nb_iterations,struct Param *program_step,struct Param *
 	printf("AFLAG: %d\n",AFLAG);
 }
 
+/*Fonction qui permet d'afficher la moyenne des 10 executions quand l'option -M*/
+void chercherMoyenne(double *time_spent){
+	double max=0,max2=0;
+	int indice1, indice2;
+	for(int i=0; i < 10; i++){
+		if(time_spent[i] > max){
+			max = time_spent[i];
+			indice1 = i;
+		}
+		if(time_spent[i] > max2 && time_spent[i] != max){
+			max2= time_spent[i];
+			indice2 = i;
+		}
+	}
+	time_spent[indice1] = -1;
+	time_spent[indice2] = -1;
+
+	printf("MAX1 : %G MAX2: %G\n",max,max2);
+
+	double moy=0;
+	for(int i=0; i < 10; i++){
+		if(time_spent[i] > 0){
+			moy += time_spent[i];
+		}
+		printf("moy = %G\n", moy);
+	}
+	moy = moy/8;
+
+	printf("Moyenne : %G\n", moy);
+
+}
+
 
 /* La recuperation des parametres se fait dans le main */
 int main(int argc, char *argv[]) {
@@ -206,7 +239,7 @@ int main(int argc, char *argv[]) {
 	nb_case_per_line.size=0;
 
 
-	
+
 
 	for (int i =1; i<argc; i++) {
 		// Récupération de la taille du problème
@@ -230,6 +263,10 @@ int main(int argc, char *argv[]) {
 		if (strcmp(argv[i],"-m") == 0) {
 			//mode execution
 			MFLAG=true;
+		}
+		if (strcmp(argv[i],"-M") == 0) {
+			//mode stats
+			MMFLAG=true;
 		}
 		if (strcmp(argv[i],"-a") == 0) {
 			AFLAG=true;
@@ -274,12 +311,27 @@ int main(int argc, char *argv[]) {
 
 	if(!MFLAG) 
 		display_options(nb_iterations,&program_step,&num_threads,&nb_case_per_line,MFLAG,AFLAG);
+
 	clock_t begin, end;
-	double time_spent;
-	begin = clock();
-	simulation(0,nb_iterations,NB_MIN_THREAD);
-	end = clock();
-	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-	printf(" Time spent: %G \n",time_spent);
+	double time_spent[10];
+	int limit,i=0;
+
+	if(MMFLAG)
+		limit=10;
+	else
+		limit=1;
+
+	for(;i < limit; i++){
+		begin = clock();
+		simulation(0,nb_iterations,NB_MIN_THREAD);
+		end = clock();
+		time_spent[i] = (double)(end - begin) / CLOCKS_PER_SEC;
+		printf(" Time spent: %G \n",time_spent[i]);
+	}
+
+	if(MMFLAG)
+		chercherMoyenne(time_spent);
+	
+
 }
 
