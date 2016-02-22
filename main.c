@@ -5,6 +5,10 @@
 #include <stdbool.h>
 #include <time.h>
 
+/**
+ @authors : Jeremy Melchor
+			Matthieu Perrin
+**/
 #define TAILLE_MIN 256
 #define TAILLE_MAX 67108864
 #define NB_MIN_THREAD 1
