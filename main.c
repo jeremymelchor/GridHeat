@@ -270,6 +270,7 @@ int main(int argc, char *argv[]) {
 
 	if(!MFLAG) 
 		display_options(nb_iterations,&program_step,&num_threads,&nb_case_per_line,MFLAG,AFLAG);
+	
 	clock_t begin, end;
 	double time_spent;
 	begin = clock();
