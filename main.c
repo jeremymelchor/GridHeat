@@ -17,7 +17,7 @@ Matthieu Perrin
 #define TEMP_FROID 0
 
 int taillePlaque;
-bool MFLAG=true;
+bool MFLAG=false;
 bool AFLAG=false;
 bool MMFLAG=false;
 
@@ -113,7 +113,7 @@ void iterative_way(float (*plaque_avant)[taillePlaque], float (*plaque_apres)[ta
 		matrix_copy(plaque_avant, plaque_apres);
 		// Permet de reinitialiser la plaque a 0 
 		memset(plaque_apres,0,taillePlaque*taillePlaque*sizeof(float));
-		if(!MFLAG){
+		if(MFLAG){
 			print_plaque(plaque_avant);
 		}
 	}
@@ -127,7 +127,7 @@ void simulation(int puissance_taillePlaque, int nbIterations, int nbThread) {
 
 	if (taillePlaque*taillePlaque > TAILLE_MAX || taillePlaque*taillePlaque < TAILLE_MIN) {
 
-		if (!MFLAG) {
+		if (MFLAG) {
 			printf("%d\n",taillePlaque*taillePlaque);
 			printf("Taille de la plaque trop grande\n");
 		}
@@ -209,14 +209,11 @@ void chercherMoyenne(double *time_spent){
 	time_spent[indice1] = -1;
 	time_spent[indice2] = -1;
 
-	printf("MAX1 : %G MAX2: %G\n",max,max2);
-
 	double moy=0;
 	for(int i=0; i < 10; i++){
 		if(time_spent[i] > 0){
 			moy += time_spent[i];
 		}
-		printf("moy = %G\n", moy);
 	}
 	moy = moy/8;
 
@@ -309,7 +306,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	if(!MFLAG) 
+	if(MFLAG) 
 		display_options(nb_iterations,&program_step,&num_threads,&nb_case_per_line,MFLAG,AFLAG);
 
 	clock_t begin, end;
@@ -331,7 +328,6 @@ int main(int argc, char *argv[]) {
 
 	if(MMFLAG)
 		chercherMoyenne(time_spent);
-	
 
 }
 
