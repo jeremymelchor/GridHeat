@@ -3,6 +3,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdbool.h>
+#include <time.h>
 
 #define TAILLE_MIN 256
 #define TAILLE_MAX 67108864
@@ -120,11 +121,8 @@ void simulation(int puissance_taillePlaque, int nbIterations, int nbThread) {
 	taillePlaque = convertPowToSize(puissance_taillePlaque);
 
 	if (taillePlaque*taillePlaque > TAILLE_MAX || taillePlaque*taillePlaque < TAILLE_MIN) {
-<<<<<<< HEAD
-		if(!MFLAG){
-=======
+
 		if (!MFLAG) {
->>>>>>> 90c723f5d954bf621457dd07e997f3969dd149f6
 			printf("%d\n",taillePlaque*taillePlaque);
 			printf("Taille de la plaque trop grande\n");
 		}
@@ -272,7 +270,12 @@ int main(int argc, char *argv[]) {
 
 	if(!MFLAG) 
 		display_options(nb_iterations,&program_step,&num_threads,&nb_case_per_line,MFLAG,AFLAG);
-
+	clock_t begin, end;
+	double time_spent;
+	begin = clock();
 	simulation(0,nb_iterations,NB_MIN_THREAD);
+	end = clock();
+	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	printf(" Time spent: %G \n",time_spent);
 }
 
