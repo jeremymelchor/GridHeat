@@ -5,6 +5,10 @@
 #include <stdbool.h>
 #include <time.h>
 
+/**
+ @authors : Jeremy Melchor
+			Matthieu Perrin
+**/
 #define TAILLE_MIN 256
 #define TAILLE_MAX 67108864
 #define NB_MIN_THREAD 1
@@ -13,7 +17,7 @@
 #define TEMP_FROID 0
 
 int taillePlaque;
-bool MFLAG=false;
+bool MFLAG=true;
 bool AFLAG=false;
 
 struct Param{
