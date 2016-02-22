@@ -17,7 +17,7 @@
 #define TEMP_FROID 0
 
 int taillePlaque;
-bool MFLAG=false;
+bool MFLAG=true;
 bool AFLAG=false;
 
 struct Param{
