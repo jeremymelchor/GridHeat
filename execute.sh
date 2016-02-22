@@ -1,2 +1,5 @@
 make
-./simulation
+echo ==================
+echo version itérative 
+echo ==================
+./simulation -M
