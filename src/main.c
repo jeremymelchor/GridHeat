@@ -104,10 +104,11 @@ void calculate_grid(float (*plaque_avant)[taillePlaque], float (*plaque_apres)[t
 				}
 				float value = plaque_avant[i][j] - plaque_avant[i][j]/3;
 				plaque_apres[i][j] += vertical(plaque_apres, value, i, j);
-				update_heat(plaque_apres, i_min, i_max);
+				
 			}
 		}
 	}
+	update_heat(plaque_apres, i_min, i_max);
 }
 
 
