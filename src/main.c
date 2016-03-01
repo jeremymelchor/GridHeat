@@ -16,7 +16,7 @@ Matthieu Perrin
 #define TEMP_CHAUD 150
 #define TEMP_FROID 0
 
-int taillePlaque;
+int taillePlaque, i_min, i_max;
 bool MFLAG=false;
 bool AFLAG=false;
 bool MMFLAG=false;
@@ -52,6 +52,16 @@ void init_plaque(float (*plaque)[taillePlaque], int i_min, int i_max) {
 }
 
 
+void update_heat(float (*plaque)[taillePlaque], int i_min, int i_max) {
+	for (int i=0; i<taillePlaque; i++) {
+		for (int j=0; j<taillePlaque; j++) {
+			if ( (j>=i_min && j<i_max) && (i>=i_min && i<i_max) )
+				plaque[i][j] = TEMP_CHAUD;
+		}
+	}
+}
+
+
 /* Convertit la puissance passee en parametre en taille */
 int convertPowToSize(int puissance_taillePlaque) {
 	return pow(2,(puissance_taillePlaque+4));
@@ -70,6 +80,7 @@ float vertical(float (*plaque_apres)[taillePlaque], float current_value, int i, 
 		plaque_apres[i-1][j] += current_value/6;
 		plaque_apres[i+1][j] += current_value/6;
 	}
+
 	return current_value -= current_value/3;
 }
 
@@ -92,31 +103,28 @@ void calculate_grid(float (*plaque_avant)[taillePlaque], float (*plaque_apres)[t
 					plaque_apres[i][j+1] += vertical(plaque_apres,(plaque_avant[i][j])/6, i, j+1);
 				}
 				float value = plaque_avant[i][j] - plaque_avant[i][j]/3;
-				plaque_apres[i][j] += vertical(plaque_apres,value, i, j);
+				plaque_apres[i][j] += vertical(plaque_apres, value, i, j);
+				update_heat(plaque_apres, i_min, i_max);
 			}
 		}
 	}
 }
 
 
-/* Copie la matrice finale dans l'ancienne afin de pouvoir la reutiliser
-en tant qu'ancienne plaque */
-void matrix_copy(float (*dest)[taillePlaque], float (*src)[taillePlaque]) {
-	memcpy(dest, src, taillePlaque*taillePlaque*sizeof(float));
-}
-
 
 /* fonction gerant la methode iterative */
 void iterative_way(float (*plaque_avant)[taillePlaque], float (*plaque_apres)[taillePlaque], int nbIterations) {
 	for (int i=0; i<nbIterations; i++) {
 		calculate_grid(plaque_avant, plaque_apres);
+
 		// simple switch de pointeur, la plaque t+1 devient celle à t, la t est préparée pour t+1;
 		float (*temp)[taillePlaque] = plaque_apres;
 		plaque_apres = plaque_avant;
 		plaque_avant = temp;
-		//matrix_copy(plaque_avant, plaque_apres);
+		
 		// Permet de reinitialiser la plaque a 0 
 		memset(plaque_apres,0,taillePlaque*taillePlaque*sizeof(float));
+
 		if(MFLAG){
 			print_plaque(plaque_avant);
 		}
@@ -142,8 +150,8 @@ void simulation(int puissance_taillePlaque, int nbIterations, int nbThread) {
 	float plaque_apres[taillePlaque][taillePlaque];
 	memset(plaque_apres,0,taillePlaque*taillePlaque*sizeof(float));
 
-	int i_min = pow(2,sqrt(taillePlaque)-1) - pow(2,sqrt(taillePlaque)-4);
-	int i_max = pow(2,sqrt(taillePlaque)-1) + pow(2,sqrt(taillePlaque)-4);
+	i_min = pow(2,sqrt(taillePlaque)-1) - pow(2,sqrt(taillePlaque)-4);
+	i_max = pow(2,sqrt(taillePlaque)-1) + pow(2,sqrt(taillePlaque)-4);
 
 	init_plaque(plaque_avant, i_min, i_max);
 
