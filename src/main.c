@@ -110,7 +110,11 @@ void matrix_copy(float (*dest)[taillePlaque], float (*src)[taillePlaque]) {
 void iterative_way(float (*plaque_avant)[taillePlaque], float (*plaque_apres)[taillePlaque], int nbIterations) {
 	for (int i=0; i<nbIterations; i++) {
 		calculate_grid(plaque_avant, plaque_apres);
-		matrix_copy(plaque_avant, plaque_apres);
+		// simple switch de pointeur, la plaque t+1 devient celle à t, la t est préparée pour t+1;
+		float (*temp)[taillePlaque] = plaque_apres;
+		plaque_apres = plaque_avant;
+		plaque_avant = temp;
+		//matrix_copy(plaque_avant, plaque_apres);
 		// Permet de reinitialiser la plaque a 0 
 		memset(plaque_apres,0,taillePlaque*taillePlaque*sizeof(float));
 		if(MFLAG){
@@ -234,8 +238,6 @@ int main(int argc, char *argv[]) {
 
 	struct Param nb_case_per_line;
 	nb_case_per_line.size=0;
-
-
 
 
 	for (int i =1; i<argc; i++) {
