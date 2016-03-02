@@ -1,3 +1,4 @@
+#!/bin/bash
 make
 echo ==================
 echo version itérative 
