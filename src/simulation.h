@@ -24,6 +24,7 @@ bool MMFLAG;
 
 int i_min;
 int i_max;
+int taillePlaque;
 
 struct Param{
 	int *p_array;
